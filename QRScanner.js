@@ -1,7 +1,7 @@
 import {Html5QrcodeScanner} from "html5-qrcode";
-import { getUserInfo } from "./userInfo";
-
+import { API } from "./API";
 let scanner;
+let submissionData = {};
 
 export function initScanner() {
   scanner = new Html5QrcodeScanner("reader", {
@@ -19,11 +19,23 @@ function OnScannerSuccess(result){
     scanner.clear();
     document.getElementById('reader').remove();
     console.log(result);
-    document.getElementById('result').innerHTML = 
-    '<h2>success</h2><p><a href=${result}>${result}</a></p>';
-    getUserInfo();
+    submissionData.qr = result;
+    navigator.geolocation.getCurrentPosition(onGeoLocSuccess,onGeoError);
 }
 
 function OnScannerError(err) {
     console.error(err);
+}
+
+
+function onGeoLocSuccess(data){
+  submissionData.phone = "232323";
+  submissionData.longitude = data.coords.longitude;
+  submissionData.latitude = data.coords.latitude;
+
+  API.submitDriverData(submissionData);
+}
+
+function onGeoError(err){
+  console.error(err);
 }
